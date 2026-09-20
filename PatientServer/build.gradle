@@ -1,0 +1,65 @@
+plugins {
+    id 'java'
+    id 'war'
+    id 'org.gretty' version '3.1.0'
+}
+
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+
+war {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
+tasks.register('stage') {
+    dependsOn 'clean'
+    dependsOn 'build'
+}
+build.mustRunAfter clean
+
+dependencies {
+    compileOnly 'javax.servlet:javax.servlet-api:3.1.0'
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // for sending email
+    implementation 'com.sun.mail:jakarta.mail:2.0.1'
+    implementation group: 'com.google.code.gson', name:'gson', version: '2.7'
+
+    implementation 'org.postgresql:postgresql:42.7.3'
+}
+
+tasks.register('downloadWebappRunner') {
+    doLast {
+        def f = file("$projectDir/webapp-runner.jar")
+        if (!f.exists()) {
+            def url = "https://repo1.maven.org/maven2/com/heroku/webapp-runner/9.0.96.0/webapp-runner-9.0.96.0.jar"
+            println "Downloading webapp-runner from: $url"
+            new URL(url).withInputStream { i ->
+                f.withOutputStream { it << i }
+            }
+            if (!f.exists() || f.length() == 0) {
+                throw new GradleException("webapp-runner.jar download failed (file missing/empty)")
+            }
+            println "Saved: ${f.absolutePath} (${f.length()} bytes)"
+        } else {
+            println "webapp-runner.jar already exists: ${f.absolutePath}"
+        }
+    }
+}
+tasks.named('stage') { dependsOn 'downloadWebappRunner' }
+
+test {
+    useJUnitPlatform()
+}

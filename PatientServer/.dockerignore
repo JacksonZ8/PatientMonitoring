@@ -1,0 +1,10 @@
+.git
+.github
+.gradle
+.idea
+build
+target
+*.iml
+*.log
+.DS_Store
+docker-compose.override.yml

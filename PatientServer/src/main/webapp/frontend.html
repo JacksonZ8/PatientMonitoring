@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Patient Monitoring App Frontend</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f7fb;
+      color: #172033;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+    }
+
+    main {
+      width: min(860px, calc(100vw - 40px));
+      background: #fff;
+      border: 1px solid #d9e0ef;
+      border-radius: 8px;
+      padding: 36px;
+      box-shadow: 0 12px 30px rgba(23, 32, 51, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      line-height: 1.2;
+    }
+
+    p {
+      margin: 0 0 18px;
+      color: #536078;
+      line-height: 1.6;
+    }
+
+    .command {
+      margin: 18px 0 24px;
+      padding: 16px;
+      overflow-x: auto;
+      border: 1px solid #cfd8ea;
+      border-radius: 6px;
+      background: #10182c;
+      color: #e8eefc;
+      font: 14px/1.6 Menlo, Monaco, Consolas, monospace;
+      white-space: pre;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    a {
+      display: inline-block;
+      padding: 12px 16px;
+      border: 1px solid #d9e0ef;
+      border-radius: 6px;
+      color: #2348c6;
+      text-decoration: none;
+      font-weight: 700;
+      background: #f8faff;
+    }
+
+    a.primary {
+      background: #2348c6;
+      border-color: #2348c6;
+      color: #fff;
+    }
+
+    a:hover {
+      background: #edf2ff;
+    }
+
+    a.primary:hover {
+      background: #1d3ba5;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Patient Monitoring App Frontend</h1>
+    <p>The app frontend is a Java Swing desktop client, so it opens as a local desktop window instead of inside this browser page.</p>
+    <p>Keep this backend running, then launch the client from a second terminal:</p>
+    <div class="command">cd /Users/apple/Documents/GitHub/PatientMonitoring/PatientMonitorClient
+PATIENT_SERVER_URL=http://127.0.0.1:8080 ./gradlew run</div>
+    <div class="actions">
+      <a class="primary" href="/">Back to Server Monitor</a>
+      <a href="/health">Check Backend Health</a>
+      <a href="/api/patients?doctor=demo">View Demo Patients JSON</a>
+    </div>
+  </main>
+</body>
+</html>

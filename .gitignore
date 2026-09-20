@@ -1,0 +1,40 @@
+# ============ Java / Gradle ============
+*.class
+*.jar
+*.war
+*.ear
+
+# Build / dependency directories
+build/
+.gradle/
+target/
+bin/
+out/
+
+# webapp-runner is downloaded at build/deploy time — never commit
+webapp-runner.jar
+
+# ============ IDE ============
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+
+# ============ OS / Editor ============
+.DS_Store
+Thumbs.db
+*.swp
+*~
+ehthumbs.db
+
+# ============ Local config / secrets ============
+.env
+.env.local
+*.local
+
+# ============ Binary docs / feedback (not source) ============
+*.docx

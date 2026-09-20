@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Patient Monitoring Server</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f7fb;
+      color: #172033;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+    }
+
+    main {
+      width: min(760px, calc(100vw - 40px));
+      background: #fff;
+      border: 1px solid #d9e0ef;
+      border-radius: 8px;
+      padding: 36px;
+      box-shadow: 0 12px 30px rgba(23, 32, 51, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      line-height: 1.2;
+    }
+
+    p {
+      margin: 0 0 24px;
+      color: #536078;
+      line-height: 1.6;
+    }
+
+    nav {
+      display: grid;
+      gap: 12px;
+    }
+
+    a {
+      display: block;
+      padding: 14px 16px;
+      border: 1px solid #d9e0ef;
+      border-radius: 6px;
+      color: #2348c6;
+      text-decoration: none;
+      font-weight: 700;
+      background: #f8faff;
+    }
+
+    a:hover {
+      background: #edf2ff;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Patient Monitoring Server</h1>
+    <p>The backend is running. Use the links below to verify the service, inspect APIs, or open the desktop app preview instructions.</p>
+    <nav>
+      <a href="/frontend.html">View App Frontend</a>
+      <a href="/health">Health Check</a>
+      <a href="/api/patients?doctor=demo">Demo Patients API</a>
+      <a href="/digital_twin/dashboard.html?doctor=demo">Digital Twin Dashboard</a>
+    </nav>
+  </main>
+</body>
+</html>
