@@ -38,3 +38,6 @@ ehthumbs.db
 
 # ============ Binary docs / feedback (not source) ============
 *.docx
+
+# Internal agent workspace data (not for the public repo)
+.workbuddy/
