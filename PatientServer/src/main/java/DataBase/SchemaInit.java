@@ -35,12 +35,16 @@ public class SchemaInit {
                             "  verified BOOLEAN NOT NULL DEFAULT FALSE," +
                             "  verification_token TEXT," +
                             "  reset_token TEXT," +
-                            "  reset_token_expires TIMESTAMP" +
+                            "  reset_token_expires TIMESTAMP," +
+                            "  session_token TEXT," +
+                            "  session_token_expires TIMESTAMP" +
                     ")"
             );
 
             // Backward-compatible migrations for existing databases.
             st.execute("ALTER TABLE doctors ADD COLUMN IF NOT EXISTS id_number TEXT");
+            st.execute("ALTER TABLE doctors ADD COLUMN IF NOT EXISTS session_token TEXT");
+            st.execute("ALTER TABLE doctors ADD COLUMN IF NOT EXISTS session_token_expires TIMESTAMP");
             st.execute("ALTER TABLE doctors ADD COLUMN IF NOT EXISTS age INT");
             st.execute("ALTER TABLE doctors ADD COLUMN IF NOT EXISTS organization TEXT");
             st.execute("ALTER TABLE doctors ADD COLUMN IF NOT EXISTS role TEXT");

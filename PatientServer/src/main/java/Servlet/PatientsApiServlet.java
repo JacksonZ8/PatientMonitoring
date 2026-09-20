@@ -20,8 +20,8 @@ public class PatientsApiServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        // doctor email (default demo)
-        String doctor = req.getParameter("doctor");
+        // Doctor identity comes from the authenticated session (set by AuthFilter)
+        String doctor = (String) req.getAttribute(AuthFilter.AUTH_EMAIL_ATTR);
         if (doctor == null || doctor.isBlank()) doctor = "demo";
 
         // load list from database

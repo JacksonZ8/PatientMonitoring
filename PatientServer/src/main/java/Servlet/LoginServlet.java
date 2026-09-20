@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.UUID;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -27,6 +28,7 @@ public class LoginServlet extends HttpServlet {
         Integer doctorId;
         String givenName;
         String familyName;
+        String token;
         LoginResponse(String status, String message) {
             this.status = status;
             this.message = message;
@@ -74,10 +76,15 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
+        // Issue a session token used to authenticate subsequent API calls
+        String token = (UUID.randomUUID().toString() + UUID.randomUUID().toString()).replace("-", "");
+        DoctorDAO.setSessionToken(d.getId(), token, java.time.LocalDateTime.now().plusDays(30));
+
         LoginResponse res = new LoginResponse("ok", "Login successful");
         res.doctorId = d.getId();
         res.givenName = d.getGivenName();
         res.familyName = d.getFamilyName();
+        res.token = token;
         out.println(gson.toJson(res));
     }
 }

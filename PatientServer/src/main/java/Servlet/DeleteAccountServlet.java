@@ -3,6 +3,7 @@ package Servlet;
 import com.google.gson.Gson;
 import DataAccessObject.DoctorDAO;
 import Models.Doctor;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -80,9 +81,14 @@ public class DeleteAccountServlet extends HttpServlet {
             return;
         }
 
-        // Hash and verify password
-        String passwordHash = Integer.toHexString(delReq.password.hashCode());
-        if (!passwordHash.equals(d.getPasswordHash())) {
+        // Verify password against the stored bcrypt hash
+        boolean passwordMatches;
+        try {
+            passwordMatches = BCrypt.checkpw(delReq.password, d.getPasswordHash());
+        } catch (Exception e) {
+            passwordMatches = false;
+        }
+        if (!passwordMatches) {
             resp.setStatus(401);
             out.println(gson.toJson(new SimpleResponse("error", "Wrong password")));
             return;

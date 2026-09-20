@@ -34,8 +34,9 @@ public class CreatePatientServlet extends HttpServlet {
             // Parse JSON body into object
             JsonObject in = new JsonParser().parse(body).getAsJsonObject();
 
-            // Extract doctor (default to "demo" if not provided)
-            String doctor = in.has("doctor") ? in.get("doctor").getAsString() : "demo";
+            // Doctor identity comes from the authenticated session (set by AuthFilter)
+            String doctor = (String) req.getAttribute(AuthFilter.AUTH_EMAIL_ATTR);
+            if (doctor == null || doctor.isBlank()) doctor = "demo";
 
             // Extract patient details from request
             String given = in.get("givenname").getAsString();

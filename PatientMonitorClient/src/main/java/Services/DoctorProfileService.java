@@ -83,11 +83,12 @@ public class DoctorProfileService {
         String url = ServerConfig.url("/api/doctor-profile?email=" +
                 URLEncoder.encode(email, StandardCharsets.UTF_8));
 
-        HttpRequest request = HttpRequest.newBuilder()
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .timeout(Duration.ofSeconds(8))
-                .GET()
-                .build();
+                .GET();
+        Session.applyAuth(builder);
+        HttpRequest request = builder.build();
 
         HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() != 200) {
@@ -98,12 +99,13 @@ public class DoctorProfileService {
     }
 
     private void saveToServer(DoctorProfile profile) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(ServerConfig.url("/api/doctor-profile")))
                 .timeout(Duration.ofSeconds(8))
                 .header("Content-Type", "application/json; charset=utf-8")
-                .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(toDto(profile)), StandardCharsets.UTF_8))
-                .build();
+                .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(toDto(profile)), StandardCharsets.UTF_8));
+        Session.applyAuth(builder);
+        HttpRequest request = builder.build();
 
         HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() < 200 || response.statusCode() >= 300) {

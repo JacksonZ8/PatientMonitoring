@@ -175,6 +175,7 @@ public class ApiClient {
         public Integer doctorId;
         public String givenName;
         public String familyName;
+        public String token;
     }
 
     public static class SimpleResponse {

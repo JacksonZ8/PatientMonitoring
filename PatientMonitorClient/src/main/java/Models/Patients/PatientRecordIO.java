@@ -82,11 +82,12 @@ public class PatientRecordIO {
                 StandardCharsets.UTF_8
         );
         String url = ServerConfig.url("/api/patient-records?doctor=" + encodedDoctor);
-        HttpRequest request = HttpRequest.newBuilder()
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .timeout(Duration.ofSeconds(8))
-                .GET()
-                .build();
+                .GET();
+        Session.applyAuth(builder);
+        HttpRequest request = builder.build();
 
         HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() != 200) {
@@ -102,12 +103,13 @@ public class PatientRecordIO {
                 doctor == null || doctor.isBlank() ? "demo" : doctor.trim(),
                 records
         );
-        HttpRequest request = HttpRequest.newBuilder()
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(ServerConfig.url("/api/patient-records")))
                 .timeout(Duration.ofSeconds(8))
                 .header("Content-Type", "application/json; charset=utf-8")
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(body), StandardCharsets.UTF_8))
-                .build();
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(body), StandardCharsets.UTF_8));
+        Session.applyAuth(builder);
+        HttpRequest request = builder.build();
 
         HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() < 200 || response.statusCode() >= 300) {

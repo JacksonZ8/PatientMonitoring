@@ -28,7 +28,7 @@ public class PatientRecordsServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
-        String doctor = req.getParameter("doctor");
+        String doctor = (String) req.getAttribute(AuthFilter.AUTH_EMAIL_ATTR);
         List<PatientRecord> records = PatientRecordDAO.listForDoctor(doctor);
         resp.getWriter().write(GSON.toJson(records));
     }
@@ -39,7 +39,9 @@ public class PatientRecordsServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
 
         SaveRequest saveRequest = GSON.fromJson(readBody(req), SaveRequest.class);
-        String doctor = saveRequest == null ? "demo" : saveRequest.doctor;
+        // Doctor identity comes from the authenticated session (set by AuthFilter)
+        String doctor = (String) req.getAttribute(AuthFilter.AUTH_EMAIL_ATTR);
+        if (doctor == null || doctor.isBlank()) doctor = "demo";
         List<PatientRecord> records = saveRequest == null || saveRequest.records == null
                 ? List.of()
                 : Arrays.asList(saveRequest.records);

@@ -2,6 +2,7 @@ package Servlet;
 
 import DataAccessObject.DoctorDAO;
 import Models.Doctor;
+import org.mindrot.jbcrypt.BCrypt;
 
 import com.google.gson.Gson;
 
@@ -53,7 +54,7 @@ public class ResetPasswordServlet extends HttpServlet {
             return;
         }
 
-        String newHash = Integer.toHexString(r.newPassword.hashCode());
+        String newHash = BCrypt.hashpw(r.newPassword, BCrypt.gensalt(12));
         DoctorDAO.updatePassword(d.getId(), newHash);
 
         out.println(gson.toJson(new SimpleResponse("ok", "Password updated")));

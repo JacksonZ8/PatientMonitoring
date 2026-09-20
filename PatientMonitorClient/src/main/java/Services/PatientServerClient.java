@@ -2,6 +2,7 @@ package Services;
 
 import Models.Patients.Patient;
 import NetWork.ServerConfig;
+import NetWork.Session;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -22,11 +23,12 @@ public class PatientServerClient {
         String doctor = URLEncoder.encode(doctorUsername == null ? "demo" : doctorUsername, StandardCharsets.UTF_8);
         String url = ServerConfig.url("/api/patients?doctor=" + doctor);
 
-        HttpRequest req = HttpRequest.newBuilder()
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .timeout(Duration.ofSeconds(8))
-                .GET()
-                .build();
+                .GET();
+        Session.applyAuth(builder);
+        HttpRequest req = builder.build();
 
         HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString());
         if (resp.statusCode() != 200) {

@@ -26,8 +26,8 @@ public class PatientApiServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
-        // doctor email
-        String doctor = req.getParameter("doctor");
+        // Doctor identity comes from the authenticated session (set by AuthFilter)
+        String doctor = (String) req.getAttribute(AuthFilter.AUTH_EMAIL_ATTR);
         if (doctor == null || doctor.isBlank()) doctor = "demo";
 
         // patient id
@@ -94,7 +94,8 @@ public class PatientApiServlet extends HttpServlet {
             // parse JSON body
             JsonObject in = new JsonParser().parse(body).getAsJsonObject();
 
-            String doctor = getStr(in, "doctor");
+            // Doctor identity comes from the authenticated session (set by AuthFilter)
+            String doctor = (String) req.getAttribute(AuthFilter.AUTH_EMAIL_ATTR);
             if (doctor == null || doctor.isBlank()) doctor = "demo";
             String givenname = getStr(in, "givenname");
             String familyname = getStr(in, "familyname");

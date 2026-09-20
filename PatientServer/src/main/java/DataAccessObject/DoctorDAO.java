@@ -132,6 +132,33 @@ public class DoctorDAO {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
+    // Store a new session token (and its expiry) for a doctor
+    public static void setSessionToken(int id, String token, LocalDateTime expires) {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "UPDATE doctors SET session_token = ?, session_token_expires = ? WHERE id = ?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, token);
+            ps.setTimestamp(2, Timestamp.valueOf(expires));
+            ps.setInt(3, id);
+            ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    // Find a doctor by a valid, non-expired session token
+    public static Doctor findBySessionToken(String token) {
+        if (token == null || token.isBlank()) return null;
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            String sql = "SELECT * FROM doctors WHERE session_token = ? AND session_token_expires > now()";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, token);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return mapRow(rs);
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException("findBySessionToken failed: " + e.getMessage(), e);
+        }
+    }
+
     // Update doctor's name using email
     public static void updateDoctorNameByEmail(String email, String givenName, String familyName) {
         if (email == null || email.isBlank()) return;

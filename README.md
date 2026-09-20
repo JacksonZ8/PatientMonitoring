@@ -43,11 +43,16 @@ setup, environment variables, and deployment notes.
 - **Email verification is enforced on login.** On registration a verification
   email is sent (configure `SMTP_*`); set `SKIP_EMAIL_VERIFICATION=true` to
   bypass it for local dev/demo.
+- **The patient-data API is authenticated.** `/login` issues a session token;
+  clients send `Authorization: Bearer <token>`, and `/api/*` (enforced by
+  `Servlet/AuthFilter`) scopes every request to the authenticated doctor. Only
+  the public `doctor=demo` data set is reachable without a token.
 
 ## Configuration (server environment variables)
 
 | Variable | Purpose |
 |----------|---------|
+| `PORT` | HTTP port (provided by the hosting platform) |
 | `DATABASE_URL` / `PG*` | PostgreSQL connection (see `PatientServer`) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | Verification email delivery |
 | `APP_BASE_URL` | Base URL used in verification links |

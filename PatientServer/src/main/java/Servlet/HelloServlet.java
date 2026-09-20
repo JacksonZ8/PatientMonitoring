@@ -13,18 +13,8 @@ public class HelloServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
 
-        String host = System.getenv("PGHOST");
-        String port = System.getenv("PGPORT");
-        String db   = System.getenv("PGDATABASE");
-        String user = System.getenv("PGUSER");
-
-        String smtpHost = System.getenv("SMTP_HOST");
-        String smtpPort = System.getenv("SMTP_PORT");
-        String smtpUser = System.getenv("SMTP_USER");
-        String smtpPass = System.getenv("SMTP_PASS");
-
+        // Never echo environment variables / credentials back to the caller.
         resp.setContentType("text/plain");
-//        resp.getWriter().write(host + port + db + user);
-        resp.getWriter().write(smtpHost + smtpPort + smtpUser + smtpPass);
+        resp.getWriter().write("ok");
     }
 }

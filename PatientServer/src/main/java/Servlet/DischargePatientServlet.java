@@ -19,10 +19,10 @@ public class DischargePatientServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // Read request parameters
-        String doctor = req.getParameter("doctor");
         String idStr = req.getParameter("id");
 
-        // Default doctor if not provided
+        // Doctor identity comes from the authenticated session (set by AuthFilter)
+        String doctor = (String) req.getAttribute(AuthFilter.AUTH_EMAIL_ATTR);
         if (doctor == null || doctor.isBlank()) doctor = "demo";
 
         // Parse patient ID

@@ -21,7 +21,7 @@ public class DoctorProfileServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
-        String email = req.getParameter("email");
+        String email = (String) req.getAttribute(AuthFilter.AUTH_EMAIL_ATTR);
         if (email == null || email.isBlank() || "demo".equalsIgnoreCase(email.trim())) {
             resp.setStatus(400);
             resp.getWriter().write("{\"ok\":false,\"error\":\"Missing real doctor email\"}");
@@ -44,12 +44,15 @@ public class DoctorProfileServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
 
         DoctorProfile profile = GSON.fromJson(readBody(req), DoctorProfile.class);
-        if (profile == null || profile.getEmail() == null || profile.getEmail().isBlank()
-                || "demo".equalsIgnoreCase(profile.getEmail().trim())) {
+        // A doctor may only update their own profile; identity comes from the session.
+        String email = (String) req.getAttribute(AuthFilter.AUTH_EMAIL_ATTR);
+        if (profile == null || email == null || email.isBlank()
+                || "demo".equalsIgnoreCase(email.trim())) {
             resp.setStatus(400);
             resp.getWriter().write("{\"ok\":false,\"error\":\"Missing real doctor email\"}");
             return;
         }
+        profile.setEmail(email);
 
         boolean updated = DoctorProfileDAO.update(profile);
         JsonObject out = new JsonObject();

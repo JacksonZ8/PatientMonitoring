@@ -39,12 +39,13 @@ public class PatientService {
         body.addProperty("age", patient.getAge());
         body.addProperty("bp", patient.getBloodPressure());
 
-        HttpRequest req = HttpRequest.newBuilder()
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(ServerConfig.url("/api/patient")))
                 .timeout(Duration.ofSeconds(8))
                 .header("Content-Type", "application/json; charset=utf-8")
-                .POST(HttpRequest.BodyPublishers.ofString(body.toString(), StandardCharsets.UTF_8))
-                .build();
+                .POST(HttpRequest.BodyPublishers.ofString(body.toString(), StandardCharsets.UTF_8));
+        Session.applyAuth(builder);
+        HttpRequest req = builder.build();
 
         HttpResponse<String> resp = HTTP.send(req, HttpResponse.BodyHandlers.ofString());
         ensureOk(resp, "Add patient failed");
@@ -60,12 +61,13 @@ public class PatientService {
                         + "&id=" + patient.getId()
         );
 
-        HttpRequest req = HttpRequest.newBuilder()
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .timeout(Duration.ofSeconds(8))
                 .header("Content-Type", "application/json; charset=utf-8")
-                .POST(HttpRequest.BodyPublishers.noBody())
-                .build();
+                .POST(HttpRequest.BodyPublishers.noBody());
+        Session.applyAuth(builder);
+        HttpRequest req = builder.build();
 
         HttpResponse<String> resp = HTTP.send(req, HttpResponse.BodyHandlers.ofString());
         ensureOk(resp, "Discharge failed");

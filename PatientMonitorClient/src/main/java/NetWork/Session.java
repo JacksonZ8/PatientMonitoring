@@ -8,8 +8,30 @@ public final class Session {
     private static volatile String doctorGivenName = "";
     private static volatile String doctorFamilyName = "";
     private static volatile String doctorRole = "";
+    // Session token issued by the backend on login (used to authenticate API calls)
+    private static volatile String token = "";
 
     private Session() {}
+
+    // Set auth token after successful login
+    public static void setToken(String value) {
+        token = (value == null ? "" : value.trim());
+    }
+
+    public static String getToken() {
+        return token;
+    }
+
+    public static boolean hasToken() {
+        return token != null && !token.isBlank();
+    }
+
+    // Attach the Authorization header to an outgoing HTTP request builder
+    public static void applyAuth(java.net.http.HttpRequest.Builder builder) {
+        if (hasToken()) {
+            builder.header("Authorization", "Bearer " + token);
+        }
+    }
 
     // Set doctor email after login
     public static void setDoctorEmail(String email) {
@@ -60,5 +82,6 @@ public final class Session {
         doctorGivenName = "";
         doctorFamilyName = "";
         doctorRole = "";
+        token = "";
     }
 }

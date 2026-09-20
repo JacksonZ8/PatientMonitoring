@@ -241,6 +241,7 @@ public class LoginPage extends ImagePanel {
 
     private void completeLogin(String email, ApiClient.LoginResponse res) {
         Session.setDoctorEmail(email);
+        Session.setToken(res.token);
         Session.setDoctorName(res.givenName, res.familyName);
 
         if (Session.getDoctorRole() == null || Session.getDoctorRole().isBlank()) {
