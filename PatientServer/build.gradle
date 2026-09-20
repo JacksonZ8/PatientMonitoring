@@ -38,6 +38,7 @@ dependencies {
     implementation group: 'com.google.code.gson', name:'gson', version: '2.7'
 
     implementation 'org.postgresql:postgresql:42.7.3'
+    implementation 'org.mindrot:jbcrypt:0.4'
 }
 
 tasks.register('downloadWebappRunner') {

@@ -3,6 +3,7 @@ package Servlet;
 import com.google.gson.Gson;
 import DataAccessObject.DoctorDAO;
 import Models.Doctor;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -50,18 +51,20 @@ public class LoginServlet extends HttpServlet {
 
         PrintWriter out = resp.getWriter();
 
-        System.out.println("EMAIL: " + loginReq.email);
-        System.out.println("HASH INPUT: " + Integer.toHexString(loginReq.password.hashCode()));
-
         Doctor d = DoctorDAO.findByEmail(loginReq.email);
         if (d == null) {
             out.println(gson.toJson(new LoginResponse("error", "Email not found")));
             return;
         }
 
-        // same simple hash as in RegisterServlet
-        String passwordHash = Integer.toHexString(loginReq.password.hashCode());
-        if (!passwordHash.equals(d.getPasswordHash())) {
+        // Verify password against the stored bcrypt hash
+        boolean passwordMatches;
+        try {
+            passwordMatches = BCrypt.checkpw(loginReq.password, d.getPasswordHash());
+        } catch (Exception e) {
+            passwordMatches = false;
+        }
+        if (!passwordMatches) {
             out.println(gson.toJson(new LoginResponse("error", "Wrong password")));
             return;
         }

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import DataAccessObject.DoctorDAO;
 import Utils.EmailSender;
 import jakarta.mail.MessagingException;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -70,38 +71,41 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        // 3. Hash password
-        String passwordHash = Integer.toHexString(registerReq.password.hashCode());
+        // 3. Hash password with bcrypt (salted, adaptive)
+        String passwordHash = BCrypt.hashpw(registerReq.password, BCrypt.gensalt(12));
 
         // 4. Generate verification token
         String token = UUID.randomUUID().toString();
 
-        // 5. Insert doctor
+        // 5. Insert doctor (starts unverified; login enforces verification)
+        int newDoctorId;
         try {
-            int newDoctorId = DoctorDAO.insertDoctor(
+            newDoctorId = DoctorDAO.insertDoctor(
                     registerReq.email,
                     registerReq.givenName,
                     registerReq.familyName,
                     passwordHash,
                     token
             );
-
-            // auto verify user (skip email verification as variables cant be add to tsuru)
-            if (newDoctorId > 0) {
-                DoctorDAO.markVerified(newDoctorId);
-            }
         } catch (Exception e) {
             e.printStackTrace();
             resp.setStatus(500);
-            out.println(gson.toJson(new SimpleResponse("error", "Registration failed: " + e.getMessage())));
+            out.println(gson.toJson(new SimpleResponse("error", "Registration failed. Please try again later.")));
             return;
         }
 
-        // 6. Send verification email
-        String appBaseUrl = System.getenv("APP_BASE_URL"); // tsuru website
-        // testing url
-        if (appBaseUrl == null || appBaseUrl.isEmpty()) {
-            System.out.println(appBaseUrl);
+        // 6. Email verification
+        // Dev/demo convenience: set SKIP_EMAIL_VERIFICATION=true to bypass email
+        // and auto-verify. Production should configure SMTP_* and leave it unset.
+        boolean skipVerification = "true".equalsIgnoreCase(System.getenv("SKIP_EMAIL_VERIFICATION"));
+        if (skipVerification) {
+            DoctorDAO.markVerified(newDoctorId);
+            out.println(gson.toJson(new SimpleResponse("ok", "Registration successful.")));
+            return;
+        }
+
+        String appBaseUrl = System.getenv("APP_BASE_URL");
+        if (appBaseUrl == null || appBaseUrl.isBlank()) {
             appBaseUrl = "http://localhost:8080/PatientServer";
         }
         String verifyLink = appBaseUrl + "/verifyEmail?token=" + token;
@@ -112,19 +116,17 @@ public class RegisterServlet extends HttpServlet {
                 verifyLink + "\n\n" +
                 "If you did not register, ignore this email.";
 
-//        try {
-//            EmailSender.sendEmail(registerReq.email, subject, body);
-//        } catch (MessagingException e) {
-//            e.printStackTrace();
-//            out.println(gson.toJson(new SimpleResponse("error", "Failed to send verification email")));
-//            return;
-//        }
-        // disable email
-        System.out.println("EMAIL DISABLED - WOULD SEND TO: " + registerReq.email);
-
-
-        // 7. respond ok
-        out.println(gson.toJson(new SimpleResponse("ok", "Registration successful. Check your email.")));
+        try {
+            EmailSender.sendEmail(registerReq.email, subject, body);
+            out.println(gson.toJson(new SimpleResponse("ok", "Registration successful. Check your email to verify your account.")));
+        } catch (MessagingException e) {
+            // SMTP not configured / send failed: cannot verify by email.
+            // Fail-safe so the app stays usable, but log loudly for operators.
+            System.err.println("WARN: verification email failed to send: " + e.getMessage()
+                    + " — auto-verifying as fallback (set SMTP_* and remove SKIP_EMAIL_VERIFICATION for production)");
+            DoctorDAO.markVerified(newDoctorId);
+            out.println(gson.toJson(new SimpleResponse("ok", "Registration successful.")));
+        }
     }
 
     // testing

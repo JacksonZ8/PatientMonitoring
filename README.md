@@ -35,10 +35,23 @@ setup, environment variables, and deployment notes.
 
 ## Status
 
-- Authentication uses environment-variable based configuration (no hardcoded
-  secrets). Password hashing is currently a placeholder and should be replaced
-  with bcrypt/Argon2 before any production use.
-- Email verification flow is stubbed and not yet enforced.
+- Authentication uses environment-variable based configuration (no hardcoded secrets).
+- **Passwords are hashed with bcrypt** (salted, adaptive) in
+  `PatientServer/src/main/java/Servlet/RegisterServlet.java` and verified in
+  `LoginServlet.java`. Accounts created before this change store legacy hashes
+  and must re-register.
+- **Email verification is enforced on login.** On registration a verification
+  email is sent (configure `SMTP_*`); set `SKIP_EMAIL_VERIFICATION=true` to
+  bypass it for local dev/demo.
+
+## Configuration (server environment variables)
+
+| Variable | Purpose |
+|----------|---------|
+| `DATABASE_URL` / `PG*` | PostgreSQL connection (see `PatientServer`) |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | Verification email delivery |
+| `APP_BASE_URL` | Base URL used in verification links |
+| `SKIP_EMAIL_VERIFICATION` | Set to `true` to auto-verify (dev/demo only) |
 
 ## License
 
